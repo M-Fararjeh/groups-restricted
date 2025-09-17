@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<component name="com.example.nuxeo.grouphiding.operations">
+  
+  <documentation>
+    Automation operations for managing group hiding rules.
+  </documentation>
+
+  <!-- Register automation operations -->
+  <extension target="org.nuxeo.ecm.core.operation.OperationServiceComponent" point="operations">
+    <operation class="com.example.nuxeo.grouphiding.operations.AddHiddenGroupOperation" />
+    <operation class="com.example.nuxeo.grouphiding.operations.RemoveHiddenGroupOperation" />
+  </extension>
+
+</component>

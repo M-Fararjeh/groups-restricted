@@ -1,0 +1,31 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Nuxeo Group Hiding Bundle
+Bundle-SymbolicName: com.example.nuxeo.nuxeo-group-hiding-bundle
+Bundle-Version: 1.0.0.SNAPSHOT
+Bundle-Activator: com.example.nuxeo.grouphiding.GroupHidingBundleActivator
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Import-Package: 
+ org.nuxeo.ecm.core.api,
+ org.nuxeo.ecm.core.api.security,
+ org.nuxeo.ecm.core.model,
+ org.nuxeo.ecm.core.query.sql.model,
+ org.nuxeo.ecm.core.security,
+ org.nuxeo.ecm.platform.usermanager,
+ org.nuxeo.ecm.platform.usermanager.exceptions,
+ org.nuxeo.ecm.automation.core.annotations,
+ org.nuxeo.runtime.api,
+ org.nuxeo.runtime.model,
+ org.nuxeo.common.xmap.annotation,
+ org.osgi.framework,
+ org.osgi.service.component,
+ org.osgi.service.component.annotations,
+ org.apache.logging.log4j,
+ javax.security.auth,
+ java.security,
+ java.util,
+ java.util.concurrent
+Export-Package: 
+ com.example.nuxeo.grouphiding.api
+Service-Component: OSGI-INF/*.xml
+Nuxeo-Component: OSGI-INF/group-hiding-security-policy.xml,OSGI-INF/group-hiding-operations.xml

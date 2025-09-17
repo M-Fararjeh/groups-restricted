@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+  Example configuration file showing how to configure group hiding rules.
+  This file should be placed in the nuxeo-server/config directory or contributed
+  via a Nuxeo Studio project.
+-->
+<component name="com.example.nuxeo.grouphiding.config.example">
+  
+  <extension target="com.example.nuxeo.grouphiding.security.GroupHidingSecurityPolicy" point="hiddenGroups">
+    
+    <!-- Hide 'administrators' and 'managers' groups for user 'john.doe' -->
+    <hiddenGroup username="john.doe">
+      <group>administrators</group>
+      <group>managers</group>
+    </hiddenGroup>
+    
+    <!-- Hide 'power-users' group for user 'jane.smith' -->
+    <hiddenGroup username="jane.smith">
+      <group>power-users</group>
+    </hiddenGroup>
+    
+    <!-- Hide multiple groups for user 'test.user' -->
+    <hiddenGroup username="test.user">
+      <group>restricted-group-1</group>
+      <group>restricted-group-2</group>
+      <group>special-access</group>
+    </hiddenGroup>
+    
+  </extension>
+  
+</component>

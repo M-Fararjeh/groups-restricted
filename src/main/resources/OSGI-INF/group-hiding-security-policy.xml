@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<component name="com.example.nuxeo.grouphiding.security.GroupHidingSecurityPolicy">
+  
+  <documentation>
+    Security policy that denies access when permissions are granted via hidden groups.
+    This component registers both the security policy and the configuration service.
+  </documentation>
+
+  <!-- Register the GroupHidingConfiguration service -->
+  <implementation class="com.example.nuxeo.grouphiding.impl.GroupHidingConfigurationImpl" />
+  
+  <service>
+    <provide interface="com.example.nuxeo.grouphiding.api.GroupHidingConfiguration" />
+  </service>
+
+  <!-- Extension point for configuring hidden groups via XML -->
+  <extension-point name="hiddenGroups">
+    <documentation>
+      Extension point to configure which groups should be hidden for which users.
+      
+      Example configuration:
+      <extension target="com.example.nuxeo.grouphiding.security.GroupHidingSecurityPolicy" point="hiddenGroups">
+        <hiddenGroup username="john.doe">
+          <group>administrators</group>
+          <group>managers</group>
+        </hiddenGroup>
+        <hiddenGroup username="jane.smith">
+          <group>power-users</group>
+        </hiddenGroup>
+      </extension>
+    </documentation>
+    <object class="com.example.nuxeo.grouphiding.impl.GroupHidingDescriptor" />
+  </extension-point>
+
+  <!-- Register the security policy -->
+  <extension target="org.nuxeo.ecm.core.security.SecurityService" point="policies">
+    <policy name="GroupHidingSecurityPolicy" 
+            class="com.example.nuxeo.grouphiding.security.GroupHidingSecurityPolicy"
+            order="100">
+      <description>
+        Security policy that prevents access granted via hidden groups for specific users.
+      </description>
+    </policy>
+  </extension>
+
+</component>
