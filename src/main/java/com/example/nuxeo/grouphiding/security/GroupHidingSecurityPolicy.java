@@ -6,9 +6,8 @@ import org.apache.logging.log4j.Logger;
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.core.api.security.ACP;
 import org.nuxeo.ecm.core.api.security.Access;
-import org.nuxeo.ecm.core.api.security.SecurityPolicy;
+import org.nuxeo.ecm.core.security.SecurityPolicy;
 import org.nuxeo.ecm.core.model.Document;
-import org.nuxeo.ecm.core.query.sql.model.SQLQuery;
 import org.nuxeo.runtime.api.Framework;
 
 import java.security.Principal;
@@ -144,12 +143,5 @@ public class GroupHidingSecurityPolicy implements SecurityPolicy {
     public boolean isExpressibleInQuery() {
         // This policy affects query results
         return true;
-    }
-
-    @Override
-    public SQLQuery.Transformer getQueryTransformer() {
-        // For now, return null - query transformation could be implemented
-        // if more sophisticated query-level filtering is needed
-        return null;
     }
 }
