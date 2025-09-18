@@ -9,7 +9,6 @@ import org.nuxeo.ecm.core.api.security.Access;
 import org.nuxeo.ecm.core.api.security.SecurityPolicy;
 import org.nuxeo.ecm.core.model.Document;
 import org.nuxeo.ecm.core.query.sql.model.SQLQuery;
-import org.nuxeo.ecm.core.security.SecurityPolicyDescriptor;
 import org.nuxeo.runtime.api.Framework;
 
 import java.security.Principal;
@@ -25,10 +24,15 @@ public class GroupHidingSecurityPolicy implements SecurityPolicy {
     private static final Logger log = LogManager.getLogger(GroupHidingSecurityPolicy.class);
 
     @Override
-    public Access checkPermission(Document doc, ACP mergedAcp, NuxeoPrincipal principal, 
+    public Access checkPermission(Document doc, ACP mergedAcp, Principal principal, 
                                 String permission, String[] resolvedPermissions, String[] additionalPrincipals) {
         
-        if (principal == null || principal.getName() == null) {
+        if (!(principal instanceof NuxeoPrincipal)) {
+            return Access.UNKNOWN;
+        }
+
+        NuxeoPrincipal nuxeoPrincipal = (NuxeoPrincipal) principal;
+        if (nuxeoPrincipal.getName() == null) {
             return Access.UNKNOWN;
         }
 
@@ -39,7 +43,7 @@ public class GroupHidingSecurityPolicy implements SecurityPolicy {
                 return Access.UNKNOWN;
             }
 
-            String username = principal.getName();
+            String username = nuxeoPrincipal.getName();
             Set<String> hiddenGroups = config.getHiddenGroupsForUser(username);
             
             if (hiddenGroups.isEmpty()) {
@@ -49,7 +53,7 @@ public class GroupHidingSecurityPolicy implements SecurityPolicy {
 
             // Check if user has the permission through visible means
             boolean hasAccessThroughVisibleMeans = hasPermissionThroughVisibleMeans(
-                mergedAcp, principal, permission, resolvedPermissions, hiddenGroups);
+                mergedAcp, nuxeoPrincipal, permission, hiddenGroups);
             
             if (hasAccessThroughVisibleMeans) {
                 // User has access through visible means, allow it
@@ -59,7 +63,7 @@ public class GroupHidingSecurityPolicy implements SecurityPolicy {
 
             // Check if user would have access only through hidden groups
             boolean hasAccessThroughHiddenGroups = hasPermissionThroughHiddenGroups(
-                mergedAcp, principal, permission, resolvedPermissions, hiddenGroups);
+                mergedAcp, nuxeoPrincipal, permission, hiddenGroups);
             
             if (hasAccessThroughHiddenGroups) {
                 // User would have access only through hidden groups, deny it
@@ -76,8 +80,7 @@ public class GroupHidingSecurityPolicy implements SecurityPolicy {
     }
 
     private boolean hasPermissionThroughVisibleMeans(ACP mergedAcp, NuxeoPrincipal principal, 
-                                                   String permission, String[] resolvedPermissions, 
-                                                   Set<String> hiddenGroups) {
+                                                   String permission, Set<String> hiddenGroups) {
         if (mergedAcp == null) {
             return false;
         }
@@ -86,12 +89,18 @@ public class GroupHidingSecurityPolicy implements SecurityPolicy {
         Set<String> visiblePrincipals = getVisiblePrincipals(principal, hiddenGroups);
         
         // Check if any of the visible principals have the required permission
-        return mergedAcp.getAccess(visiblePrincipals.toArray(new String[0]), permission).toBoolean();
+        for (String visiblePrincipal : visiblePrincipals) {
+            Access access = mergedAcp.getAccess(visiblePrincipal, permission);
+            if (Access.GRANT.equals(access)) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     private boolean hasPermissionThroughHiddenGroups(ACP mergedAcp, NuxeoPrincipal principal,
-                                                   String permission, String[] resolvedPermissions,
-                                                   Set<String> hiddenGroups) {
+                                                   String permission, Set<String> hiddenGroups) {
         if (mergedAcp == null || hiddenGroups.isEmpty()) {
             return false;
         }
@@ -99,8 +108,8 @@ public class GroupHidingSecurityPolicy implements SecurityPolicy {
         // Check if any hidden group has the required permission
         for (String hiddenGroup : hiddenGroups) {
             if (principal.isMemberOf(hiddenGroup)) {
-                Access access = mergedAcp.getAccess(new String[]{hiddenGroup}, permission);
-                if (access.toBoolean()) {
+                Access access = mergedAcp.getAccess(hiddenGroup, permission);
+                if (Access.GRANT.equals(access)) {
                     return true;
                 }
             }
@@ -132,13 +141,13 @@ public class GroupHidingSecurityPolicy implements SecurityPolicy {
     }
 
     @Override
-    public boolean isExpressibleInQuery(String repositoryName) {
+    public boolean isExpressibleInQuery() {
         // This policy affects query results
         return true;
     }
 
     @Override
-    public SQLQuery.Transformer getQueryTransformer(String repositoryName) {
+    public SQLQuery.Transformer getQueryTransformer() {
         // For now, return null - query transformation could be implemented
         // if more sophisticated query-level filtering is needed
         return null;
