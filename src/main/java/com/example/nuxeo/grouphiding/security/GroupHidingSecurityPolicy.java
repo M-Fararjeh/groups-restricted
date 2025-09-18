@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.core.api.security.ACP;
 import org.nuxeo.ecm.core.api.security.Access;
-import org.nuxeo.ecm.core.api.security.SecurityPolicy;
+import org.nuxeo.ecm.core.security.SecurityPolicy;
 import org.nuxeo.ecm.core.model.Document;
 import org.nuxeo.runtime.api.Framework;
 
